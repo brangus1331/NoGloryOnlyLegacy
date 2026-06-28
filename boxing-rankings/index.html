@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FIGHT NIGHT FOREVER</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <div id="topNav">
+    <button class="nav-btn" onclick="showView('rankings-view')">RANKINGS</button>
+    <button class="nav-btn" onclick="showView('history-view')">HISTORY</button>
+    <button class="nav-btn" onclick="showView('fightcard-view')">FIGHT CARD</button>
+    <button class="nav-btn" onclick="showView('fighters-view')">FIGHTERS</button>
+</div>
+
+    
+   <div class="arena"></div>
+
+    <div id="siteIntro"></div>
+
+
+    <!-- RANKINGS VIEW -->
+    <div id="rankings-view" class="view active">
+        <h1>Rankings</h1>
+
+        <div id="championBanner" style="margin-bottom:25px;text-align:center;"></div>
+        <div style="margin-bottom:15px;">
+    <button type="button" onclick="setRankingDivision('P4P')">Pound for Pound</button>
+    <button type="button" onclick="setRankingDivision('Heavyweight')">Heavyweight</button>
+    <button type="button" onclick="setRankingDivision('Middleweight')">Middleweight</button>
+    <button type="button" onclick="setRankingDivision('Lightweight')">Lightweight</button>
+</div>
+
+        <table id="rankings-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Fighter</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Draws</th>
+                    <th>ELO</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- HISTORY VIEW -->
+    <div id="history-view" class="view">
+        <h1>Match History</h1>
+        <div id="history-list">No matches yet.</div>
+    </div>
+
+    <!-- FIGHT CARD VIEW -->
+    <div id="fightcard-view" class="view">
+        <h1>Fight Card (Up to 15 Fights)</h1>
+
+        <button onclick="addFightToCard()" type="button">Add Fight</button>
+
+        <button onclick="generateDivisionCard('Heavyweight')" type="button">Generate Heavyweight Card</button>
+<button onclick="generateDivisionCard('Middleweight')" type="button">Generate Middleweight Card</button>
+<button onclick="generateDivisionCard('Lightweight')" type="button">Generate Lightweight Card</button>
+<button onclick="generateMixedCard()">Generate Mixed Card</button>
+
+
+        <button onclick="clearCard()" type="button">Clear Card</button>
+        <button onclick="simulateCard()" type="button">Simulate Card</button>
+
+        <div id="cardContainer" style="margin-top:20px;"></div>
+
+        <h2>Card Results</h2>
+        <div id="cardResults">No card simulated yet.</div>
+    </div>
+
+   <!-- FIGHTERS VIEW -->
+<div id="fighters-view" class="view">
+    <h1>Fighter Profiles</h1>
+
+    <!-- THIS DROPDOWN MUST BE ALPHABETIZED -->
+    <select id="fighter-select"></select>
+
+    <button onclick="openAddFighter()" style="margin-top:10px;">Add New Fighter</button>
+    <button onclick="openEditWeightClass()" style="background:#444;">Edit Weight Class</button>
+
+    <div id="fighter-profile" style="margin-top:20px;"></div>
+</div>
+
+    
+<div id="editWeightClassModal" class="modal">
+    <div class="modal-content">
+        <h3>Edit Weight Class</h3>
+
+        <label>New Weight Class:</label>
+        <select id="editWeightClassSelect">
+            <option value="Heavyweight">Heavyweight</option>
+            <option value="Middleweight">Middleweight</option>
+            <option value="Lightweight">Lightweight</option>
+        </select>
+
+        <br><br>
+
+        <button onclick="saveEditedWeightClass()">Save</button>
+        <button onclick="closeEditWeightClass()" style="background:#600;">Cancel</button>
+    </div>
+</div>
+
+    <!-- POSTER MODAL -->
+    <div id="posterModal" style="
+        display:none;
+        position:fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background:rgba(0,0,0,0.85);
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+    ">
+        <div id="posterContent" style="
+            background:#1a0000;
+            border:3px solid #660000;
+            padding:20px;
+            width:420px;
+            text-align:center;
+            color:#fff;
+            position:relative;
+        ">
+            <button onclick="closePoster()" type="button" style="
+                position:absolute;
+                top:10px; right:10px;
+                background:#660000;
+                color:#fff;
+                border:none;
+                padding:6px 10px;
+                cursor:pointer;
+            ">X</button>
+
+            <div id="posterInner"></div>
+        </div>
+    </div>
+
+    <!-- EDIT FIGHT MODAL -->
+    <div id="editFightModal" style="
+        display:none;
+        position:fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background:rgba(0,0,0,0.85);
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+    ">
+        <div style="
+            background:#1a0000;
+            border:3px solid #660000;
+            padding:20px;
+            width:420px;
+            color:#fff;
+            text-align:center;
+            position:relative;
+        ">
+            <button onclick="closeEditFight()" type="button" style="
+                position:absolute; top:10px; right:10px;
+                background:#660000; color:#fff; border:none;
+                padding:6px 10px; cursor:pointer;
+            ">X</button>
+
+            <h2>Edit Fight</h2>
+
+            <div id="editFightContent"></div>
+
+            <button onclick="saveEditedFight()" type="button" style="margin-top:15px;background:#444;">Save Changes</button>
+        </div>
+    </div>
+<div id="editRecordModal" class="modal" style="display:none;">
+    <div class="modal-content" style="background:#222;padding:20px;border:2px solid #660000;">
+        <h2>Edit Record</h2>
+
+        <label>Wins:</label>
+        <input type="number" id="editWins">
+
+        <label>Losses:</label>
+        <input type="number" id="editLosses">
+
+        <label>Draws:</label>
+        <input type="number" id="editDraws">
+
+        <label>ELO:</label>
+        <input type="number" id="editElo">
+
+        <br><br>
+
+        <button onclick="saveEditedRecord()">Save</button>
+        <button onclick="closeEditRecord()" style="background:#900;">Cancel</button>
+    </div>
+</div>
+<!-- DELETE FIGHTER MODAL -->
+<div id="deleteFighterModal" class="modal" style="display:none;">
+    <div class="modal-content" style="background:#1a0000; border:3px solid #660000; padding:20px; width:420px; color:#fff; text-align:center; position:relative;">
+        
+        <button onclick="closeDeleteFighter()" type="button" style="
+            position:absolute; top:10px; right:10px;
+            background:#660000; color:#fff; border:none;
+            padding:6px 10px; cursor:pointer;
+        ">X</button>
+
+        <h2>Delete Fighter</h2>
+        <p id="deleteFighterName"></p>
+
+        <button onclick="confirmDeleteFighter()" style="background:#900;margin-top:20px;">Delete</button>
+        <button onclick="closeDeleteFighter()" style="background:#444;margin-top:20px;">Cancel</button>
+    </div>
+</div>
+
+<!-- ADD FIGHTER MODAL -->
+<div id="addFighterModal" class="modal" style="display:none;">
+    <div class="modal-content" style="background:#1a0000; border:3px solid #660000; padding:20px; width:420px; color:#fff; text-align:center; position:relative;">
+        
+        <button onclick="closeAddFighter()" type="button" style="
+            position:absolute; top:10px; right:10px;
+            background:#660000; color:#fff; border:none;
+            padding:6px 10px; cursor:pointer;
+        ">X</button>
+
+        <h2>Add New Fighter</h2>
+
+        <label>Name:</label>
+        <input type="text" id="newFighterName">
+
+        <br><br>
+
+        <label>Weight Class:</label>
+        <select id="newFighterWeight">
+            <option value="Heavyweight">Heavyweight</option>
+            <option value="Middleweight">Middleweight</option>
+            <option value="Lightweight">Lightweight</option>
+        </select>
+
+        <br><br>
+
+        <label>ELO:</label>
+        <input type="number" id="newFighterElo" value="1500">
+
+        <br><br>
+
+        <label>Image Filename (in /temp/):</label>
+        <input type="text" id="newFighterImg" placeholder="john_doe.png">
+
+        <br><br>
+
+        <button onclick="saveNewFighter()" type="button" style="background:#444;">Add Fighter</button>
+    </div>
+</div>
+
+
+    <!-- ADD FIGHT MODAL -->
+    <div id="addFightModal" style="
+        display:none;
+        position:fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background:rgba(0,0,0,0.85);
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+    ">
+        <div style="
+            background:#1a0000;
+            border:3px solid #660000;
+            padding:20px;
+            width:420px;
+            color:#fff;
+            text-align:center;
+            position:relative;
+        ">
+            <button onclick="closeAddFightModal()" type="button" style="
+                position:absolute; top:10px; right:10px;
+                background:#660000; color:#fff; border:none;
+                padding:6px 10px; cursor:pointer;
+            ">X</button>
+
+            <h2>Add Fight</h2>
+
+            <label>Weight Class:</label>
+            <select id="fightWeightClass" onchange="updateFightDropdowns()">
+                <option value="">Select Weight Class</option>
+                <option value="Heavyweight">Heavyweight</option>
+                <option value="Middleweight">Middleweight</option>
+                <option value="Lightweight">Lightweight</option>
+            </select>
+
+            <br><br>
+
+            <label>Fighter 1:</label>
+            <select id="fighter1"></select>
+
+            <br><br>
+
+            <label>Fighter 2:</label>
+            <select id="fighter2"></select>
+
+            <br><br>
+
+            <button onclick="confirmAddFight()" type="button">Add Fight</button>
+        </div>
+    </div>
+
+    <!-- LOAD JS -->
+    <script src="script.js"></script>
+  
+
+    <!-- your arena -->
+    <div class="arena"></div>
+
+    <!-- your views -->
+    <div id="rankings-view" class="view active"> ... </div>
+    <div id="history-view" class="view"> ... </div>
+    <div id="fighters-view" class="view"> ... </div>
+    <div id="fightcard-view" class="view">...</div>
+
+
+    <!-- BOTTOM CONTROL BAR -->
+    <div id="bottomControls">
+        <button id="saveBtn" type="button">Save</button>
+        <button id="loadBtn" type="button">Load</button>
+        <input type="file" id="fileInput" accept=".json" style="display:none;">
+        <button id="clearBtn" type="button">Clear History & Reset Universe</button>
+        <button onclick="clearHistory()" type="button">Clear Match History Only</button>
+        <button onclick="restoreOriginalElo()" type="button">Restore Original ELO</button>
+    </div>
+
+</body>
+
+</html>
